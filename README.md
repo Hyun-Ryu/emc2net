@@ -15,6 +15,11 @@ numpy==1.17.2
 scipy==1.3.1
 ```
 
+## How to build synthetic dataset
+- All of the data-generating codes are written in MATLAB, saved in `data_generation` foler.
+- For AWGN+PO dataset, run `dataset_generation_AWGNPO.m`.
+- For Rican or Rayleigh dataset, run `dataset_generation_fading.m`.
+
 ## Train
 ### Phase 1: *Classifier pretraining*
 ```bash
