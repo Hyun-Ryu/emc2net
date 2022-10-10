@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
-import pdb
 
 from modules import ISAB, PMA, SAB
+
 
 class SetTransformer(nn.Module):
     def __init__(

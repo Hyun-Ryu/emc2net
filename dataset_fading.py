@@ -1,13 +1,9 @@
-import pdb
-import random
 import numpy as np
-from numpy import linalg as la
 from scipy import io
-from PIL import Image
 from glob import glob
-import skimage.io as skio
 import torch
 from torch.utils.data import Dataset
+
 
 class SignalSet(Dataset):
     def __init__(self, root='/', mode='train'):
@@ -20,13 +16,16 @@ class SignalSet(Dataset):
             input_ = io.loadmat(mat)['frame_input'][:,0]
             self.sig_dict[mod_type].append(input_)
 
-        # devide into train/validation set
-        ref_point = int(len(self.sig_dict[list(self.sig_dict.keys())[0]]) * 0.8)
+        # devide into train/validation/test set
+        ref_point_1 = int(len(self.sig_dict[list(self.sig_dict.keys())[0]]) * 0.8)
+        ref_point_2 = int(len(self.sig_dict[list(self.sig_dict.keys())[0]]) * 0.9)
         for key in self.sig_dict.keys():
             if mode == 'train':
-                self.sig_dict[key] = self.sig_dict[key][:ref_point]
+                self.sig_dict[key] = self.sig_dict[key][:ref_point_1]
+            elif mode == 'valid':
+                self.sig_dict[key] = self.sig_dict[key][ref_point_1:ref_point_2]
             else:
-                self.sig_dict[key] = self.sig_dict[key][ref_point:]
+                self.sig_dict[key] = self.sig_dict[key][ref_point_2:]
 
     def __getitem__(self, index):
         num_per_class = len(self.sig_dict[list(self.sig_dict.keys())[0]])

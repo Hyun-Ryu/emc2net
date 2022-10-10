@@ -2,33 +2,25 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as pyplot
 import os
-import pdb
-import time
-import random
-import logging
 import argparse
-import itertools
-import datetime
 import numpy as np
-import seaborn as sns
 import torch
-from torch.utils.data import DataLoader
 from torch.autograd import Variable
-from torch.nn.parallel import DistributedDataParallel as DDP
+from torch.utils.data import DataLoader
 
-from model_cl import *
-from model_eq import *
-from dataset_eq_cl import *
+from model_classifier import *
+from model_equalizer import *
+from dataset_fading import *
 from util import *
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--n_cpu", type=int, default=8)
-parser.add_argument("--root", type=str, default="/home/user/amc")
-parser.add_argument("--data_name", type=str, default="Rician_30dB_1024sym")
-parser.add_argument("--exp_name", type=str, default="rician_phase3")
+parser.add_argument("--n_cpu", type=int, default=8, help='number of cpu threads to use during batch generation')
+parser.add_argument("--root", type=str, default="/home/user/amc", help='root directory')
+parser.add_argument("--data_name", type=str, default="Rician_30dB_1024sym", help='name of the dataset')
+parser.add_argument("--exp_name", type=str, default="rician_phase3", help='name of the experiment')
 opt = parser.parse_args()
 print(str(opt) + "\n")
 
@@ -38,7 +30,7 @@ Tensor = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTen
 LongTensor = torch.cuda.LongTensor if torch.cuda.is_available() else torch.LongTensor
 
 # Load Models
-eq = VAEBCEx2(dim_hidden=2, ker_size=65).cuda()
+eq = RBx2(dim_hidden=2, ker_size=65).cuda()
 eq.load_state_dict(torch.load(opt.root+'/experiments/'+opt.exp_name+'/saved_models/eq_epoch_best.pth'))
 print("[Equalizer] [# of parameters: %d]" % count_parameters(eq))
 
@@ -52,7 +44,7 @@ print("[Classifier] [# of parameters: %d]" % count_parameters(cl))
 CE = torch.nn.CrossEntropyLoss().cuda()
 
 # Dataset & Dataloader
-dataset = SignalSet(root=opt.root+'/data/'+opt.data_name, mode='valid')
+dataset = SignalSet(root=opt.root+'/data/'+opt.data_name, mode='test')
 dataloader = DataLoader(
     dataset,
     batch_size = 20,
@@ -62,7 +54,7 @@ dataloader = DataLoader(
 
 class2num = dataset.class2num()
 
-# Validation
+# Test
 loss_valid_tot = 0
 num_correct_tot_valid, num_data_valid = 0, 0
 num_correct_mod, num_data_mod = 0, 0

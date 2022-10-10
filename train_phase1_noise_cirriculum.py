@@ -2,41 +2,36 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as pyplot
 import os
-import pdb
 import time
-import random
-import logging
 import argparse
-import itertools
 import datetime
 import numpy as np
-import seaborn as sns
 import torch
-from torch.utils.data import DataLoader
 from torch.autograd import Variable
-from torch.nn.parallel import DistributedDataParallel as DDP
+from torch.utils.data import DataLoader
 
-from model_cl import *
-from dataset_cl import *
+from model_classifier import *
+from dataset_awgnpo import *
 from util import *
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--n_epochs", type=int, default=500)
-parser.add_argument("--switch_epochs", type=list, default=[0,10,20,30,40,50,60,70,80,90])
-parser.add_argument("--batch_size", type=int, default=64)
-parser.add_argument("--lr", type=float, default=1e-3)
-parser.add_argument("--n_cpu", type=int, default=8)
-parser.add_argument("--dim", type=int, default=128)
-parser.add_argument("--n_heads", type=int, default=4)
-parser.add_argument("--n_anc", type=int, default=64)
-parser.add_argument("--n_seeds", type=int, default=1)
-parser.add_argument("--n_class", type=int, default=8)
-parser.add_argument("--root", type=str, default="/home/user/amc")
-parser.add_argument("--data_name", type=str, default="matlab_awgn_8class_1kpts")
-parser.add_argument("--exp_name", type=str, default="noise_curriculum_pretraining")
+parser.add_argument("--n_epochs", type=int, default=500, help='number of training epochs')
+parser.add_argument("--switch_epochs", type=list, default=[0,10,20,30,40,50,60,70,80,90], help='list of epochs where noise curriculum change')
+parser.add_argument("--batch_size", type=int, default=64, help='size of the batches')
+parser.add_argument("--lr", type=float, default=1e-3, help='learning rate')
+parser.add_argument("--n_cpu", type=int, default=8, help='number of cpu threads to use during batch generation')
+parser.add_argument("--dim", type=int, default=128, help='hidden dimension of ISAB in classifier')
+parser.add_argument("--n_heads", type=int, default=4, help='number of attention heads of ISAB in classifier')
+parser.add_argument("--n_anc", type=int, default=64, help='number of inducing points of ISAB in classifier')
+parser.add_argument("--n_seeds", type=int, default=1, help='number of seed vectors of PMA in classifier')
+parser.add_argument("--n_class", type=int, default=8, help='number of target modulation types')
+parser.add_argument("--n_snr", type=int, default=10, help='total number of steps of noise curriculum')
+parser.add_argument("--root", type=str, default='/home/user/amc', help='root directory')
+parser.add_argument("--data_name", type=str, default='matlab_awgn_8class_1kpts', help='name of the dataset')
+parser.add_argument("--exp_name", type=str, default='noise_curriculum_pretraining', help='name of the experiment')
 opt = parser.parse_args()
 print(str(opt) + "\n")
 
@@ -58,7 +53,7 @@ CE = torch.nn.CrossEntropyLoss().cuda()
 optimizer = torch.optim.Adam(cl.parameters(), lr=opt.lr)
 
 # Dataset & Dataloader
-dataset_valid = SignalSet(root=opt.root+'/data/'+opt.data_name, mode='valid', n_class=opt.n_class, n_snr=10)
+dataset_valid = SignalSet(root=opt.root+'/data/'+opt.data_name, mode='valid', n_class=opt.n_class, n_snr=opt.n_snr)
 dataloader_valid = DataLoader(
     dataset_valid,
     batch_size = 36,
@@ -110,7 +105,7 @@ for epoch in range(0, opt.n_epochs):
         cl.train()
         optimizer.zero_grad()
 
-        output_ = cl(input_)   # input_: (b, 1000, 2)
+        output_ = cl(input_)
 
         loss = CE(output_, mod_)
         loss_tot += loss.item()
@@ -169,7 +164,7 @@ for epoch in range(0, opt.n_epochs):
             # --------------------
 
             cl.eval()
-            output_ = cl(input_)   # input_: (b, 1000, 2)
+            output_ = cl(input_)
 
             loss_valid = CE(output_, mod_)
             loss_valid_tot += loss_valid.item()

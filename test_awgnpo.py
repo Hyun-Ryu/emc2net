@@ -2,38 +2,30 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as pyplot
 import os
-import pdb
-import time
-import random
-import logging
 import argparse
-import itertools
-import datetime
 import numpy as np
-import seaborn as sns
 import torch
-from torch.utils.data import DataLoader
 from torch.autograd import Variable
-from torch.nn.parallel import DistributedDataParallel as DDP
+from torch.utils.data import DataLoader
 
-from model_cl import *
-from dataset_cl import *
+from model_classifier import *
+from dataset_awgnpo import *
 from util import *
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--epoch", type=str, default='best')
-parser.add_argument("--n_cpu", type=int, default=8)
-parser.add_argument("--dim", type=int, default=128)
-parser.add_argument("--n_heads", type=int, default=4)
-parser.add_argument("--n_anc", type=int, default=64)
-parser.add_argument("--n_seeds", type=int, default=1)
-parser.add_argument("--n_class", type=int, default=8)
-parser.add_argument("--root", type=str, default="/home/user/amc")
-parser.add_argument("--data_name", type=str, default="matlab_awgn_8class_1kpts")
-parser.add_argument("--exp_name", type=str, default="noise_curriculum_pretraining")
+parser.add_argument("--epoch", type=str, default='best', help='choose which trained epoch to use')
+parser.add_argument("--n_cpu", type=int, default=8, help='number of cpu threads to use during batch generation')
+parser.add_argument("--dim", type=int, default=128, help='hidden dimension of ISAB in classifier')
+parser.add_argument("--n_heads", type=int, default=4, help='number of attention heads of ISAB in classifier')
+parser.add_argument("--n_anc", type=int, default=64, help='number of inducing points of ISAB in classifier')
+parser.add_argument("--n_seeds", type=int, default=1, help='number of seed vectors of PMA in classifier')
+parser.add_argument("--n_class", type=int, default=8, help='number of target modulation types')
+parser.add_argument("--root", type=str, default="/home/user/amc", help='root directory')
+parser.add_argument("--data_name", type=str, default="matlab_awgn_8class_1kpts", help='name of the dataset')
+parser.add_argument("--exp_name", type=str, default="noise_curriculum_pretraining", help='name of the experiment')
 opt = parser.parse_args()
 print(str(opt) + "\n")
 
@@ -49,7 +41,7 @@ print("[Classifier] [# of parameters: %d]" % count_parameters(cl))
 CE = torch.nn.CrossEntropyLoss().cuda()
 
 # Dataset & Dataloader
-dataset = SignalSet(root=opt.root+'/data/'+opt.data_name, mode='valid', n_class=opt.n_class)
+dataset = SignalSet(root=opt.root+'/data/'+opt.data_name, mode='test', n_class=opt.n_class)
 dataloader = DataLoader(
     dataset,
     batch_size = 20,
@@ -59,7 +51,7 @@ dataloader = DataLoader(
 
 class2num = dataset.class2num()
 
-# Validation
+# Test
 loss_valid_tot = 0
 num_correct_tot_valid, num_data_valid = 0, 0
 num_correct_mod, num_data_mod = 0, 0
@@ -80,7 +72,7 @@ for t, sigg in enumerate(dataloader):
     # --------------------
 
     cl.eval()
-    output_ = cl(input_)   # input_: (b, 1000, 2)
+    output_ = cl(input_)
 
     loss_valid = CE(output_, mod_)
     loss_valid_tot += loss_valid.item()
@@ -118,7 +110,7 @@ for t, sigg in enumerate(dataloader):
         )
         num_correct_mod, num_data_mod = 0, 0
     
-    # Confusion
+    # Confusion matrix
     gt = mod_.data.cpu().numpy()
     pred = torch.max(output_, dim=1)[1].data.cpu().numpy()
     for i in range(len(gt)):

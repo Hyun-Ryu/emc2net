@@ -4,13 +4,13 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
 import math
-import pdb
 
 from util import *
 
-class VAEBCEx2(nn.Module):
+
+class RBx2(nn.Module):
     def __init__(self, dim_hidden=2, ker_size=129):
-        super(VAEBCEx2, self).__init__()
+        super(RBx2, self).__init__()
         self.conv_1 = nn.Sequential(
             nn.Conv2d(in_channels=2, out_channels=dim_hidden, kernel_size=(1,ker_size), padding=(0,ker_size//2), bias=True),
             nn.ReLU(),

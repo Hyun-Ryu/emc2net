@@ -1,12 +1,9 @@
-import random
 import numpy as np
-import torch
-from torch.utils.data import Dataset
-from PIL import Image
-import skimage.io as skio
 from glob import glob
 from scipy import io
-import pdb
+import torch
+from torch.utils.data import Dataset
+
 
 class SignalSet(Dataset):
     def __init__(self, root='', mode='train', n_class=8, n_snr=10):
@@ -16,10 +13,14 @@ class SignalSet(Dataset):
         self.list_snr = list(28-2*np.arange(self.n_snr))
         self.list_snr.reverse()
 
+        ref_point_1 = int(288*0.8)
+        ref_point_2 = int(288*0.9)
         if mode == 'train':
-            start, end = 0, 216
+            start, end = 0, ref_point_1
+        elif mode == 'valid':
+            start, end = ref_point_1, ref_point_2
         else:
-            start, end = 216, 288
+            start, end = ref_point_2, 288
         self.n_inst = end - start
 
         mat_list = glob(root + '/*.mat')
