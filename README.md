@@ -15,8 +15,16 @@ numpy==1.17.2
 scipy==1.3.1
 ```
 
+### Getting started
+
+- Clone this repo:
+```bash
+git clone https://github.com/Hyun-Ryu/emc2net emc2net
+cd emc2net
+```
+
 ## How to build synthetic dataset
-- All of the data-generating codes are written in MATLAB, saved in `data_generation` foler.
+- All of the data-generating codes are written in MATLAB, saved in `data_generation` folder.
 - For AWGN+PO dataset, run `dataset_generation_AWGNPO.m`.
 - For Rican or Rayleigh dataset, run `dataset_generation_fading.m`.
 

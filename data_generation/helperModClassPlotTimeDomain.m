@@ -1,12 +1,4 @@
 function helperModClassPlotTimeDomain(dataDirectory,modulationTypes,fs)
-%helperModClassPlotTimeDomain Time domain plots of frames
-%   helperModClassPlotTimeDomain(DIR,MODTYPES,FS) plots a spectrogram for
-%   each modulation type specified in MODTYPES using datafiles in the DIR
-%   folder. FS is the sample rate.
-%   
-%   See also ModulationClassificationWithDeepLearningExample.
-
-%   Copyright 2019 The MathWorks, Inc.
 
 numRows = ceil(length(modulationTypes) / 4);
 for modType=1:length(modulationTypes)
