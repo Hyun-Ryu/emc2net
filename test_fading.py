@@ -32,13 +32,11 @@ LongTensor = torch.cuda.LongTensor if torch.cuda.is_available() else torch.LongT
 # Load Models
 eq = RBx2(dim_hidden=2, ker_size=65).cuda()
 eq.load_state_dict(torch.load(opt.root+'/experiments/'+opt.exp_name+'/saved_models/eq_epoch_best.pth'))
-print("[Equalizer] [# of parameters: %d]" % count_parameters(eq))
 
 MF = RRC(N=33, alpha=.35, OS=8)
 
-cl = SetTransformer(dim_output=8, dim_hidden=128, num_heads=4, num_inds=64, num_outputs=1).cuda()
+cl = SetTransformer(dim_output=8, dim_hidden=256, num_heads=4, num_inds=16, num_outputs=1).cuda()
 cl.load_state_dict(torch.load(opt.root+'/experiments/%s/saved_models/cl_epoch_best.pth' % opt.exp_name))
-print("[Classifier] [# of parameters: %d]" % count_parameters(cl))
 
 # Loss
 CE = torch.nn.CrossEntropyLoss().cuda()

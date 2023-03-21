@@ -23,9 +23,9 @@ parser.add_argument("--switch_epochs", type=list, default=[0,10,20,30,40,50,60,7
 parser.add_argument("--batch_size", type=int, default=64, help='size of the batches')
 parser.add_argument("--lr", type=float, default=1e-3, help='learning rate')
 parser.add_argument("--n_cpu", type=int, default=8, help='number of cpu threads to use during batch generation')
-parser.add_argument("--dim", type=int, default=128, help='hidden dimension of ISAB in classifier')
+parser.add_argument("--dim", type=int, default=256, help='hidden dimension of ISAB in classifier')
 parser.add_argument("--n_heads", type=int, default=4, help='number of attention heads of ISAB in classifier')
-parser.add_argument("--n_anc", type=int, default=64, help='number of inducing points of ISAB in classifier')
+parser.add_argument("--n_anc", type=int, default=16, help='number of inducing points of ISAB in classifier')
 parser.add_argument("--n_seeds", type=int, default=1, help='number of seed vectors of PMA in classifier')
 parser.add_argument("--n_class", type=int, default=8, help='number of target modulation types')
 parser.add_argument("--n_snr", type=int, default=10, help='total number of steps of noise curriculum')
@@ -44,7 +44,6 @@ LongTensor = torch.cuda.LongTensor if torch.cuda.is_available() else torch.LongT
 
 # Load & Initialize Model
 cl = SetTransformer(dim_output=opt.n_class, dim_hidden=opt.dim, num_heads=opt.n_heads, num_inds=opt.n_anc, num_outputs=opt.n_seeds).cuda()
-print("[Classifier] [# of parameters: %d]" % count_parameters(cl))
 
 # Loss
 CE = torch.nn.CrossEntropyLoss().cuda()

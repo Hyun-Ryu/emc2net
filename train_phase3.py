@@ -27,6 +27,7 @@ parser.add_argument("--root", type=str, default="/home/user/amc", help='root dir
 parser.add_argument("--data_name", type=str, default="Rician_30dB_1024sym", help='name of the dataset')
 parser.add_argument("--exp_name", type=str, default="rician_phase3", help='name of the experiment')
 parser.add_argument("--pretrain_exp_name", type=str, default="noise_curriculum_pretraining", help='name of the experiment of pretrained classifier')
+parser.add_argument("--phase2_exp_name", type=str, default="rician_phase2", help='name of the experiment of phase2')
 opt = parser.parse_args()
 print(str(opt) + "\n")
 
@@ -40,16 +41,14 @@ LongTensor = torch.cuda.LongTensor if torch.cuda.is_available() else torch.LongT
 
 # Load Models
 eq = RBx2(dim_hidden=2, ker_size=65).cuda()
-eq.load_state_dict(torch.load(opt.root+'/experiments/rician_phase2/saved_models/eq_epoch_best.pth'))
-print("[Equalizer] [# of parameters: %d]" % count_parameters(eq))
+eq.load_state_dict(torch.load(opt.root+'/experiments/%s/saved_models/eq_epoch_best.pth' % opt.phase2_exp_name))
 
 MF = RRC(N=33, alpha=.35, OS=8)
 for para in MF.parameters():
     para.requires_grad = False
 
-cl = SetTransformer(dim_output=8, dim_hidden=128, num_heads=4, num_inds=64, num_outputs=1).cuda()
+cl = SetTransformer(dim_output=8, dim_hidden=256, num_heads=4, num_inds=16, num_outputs=1).cuda()
 cl.load_state_dict(torch.load(opt.root+'/experiments/%s/saved_models/cl_epoch_best.pth' % opt.pretrain_exp_name))
-print("[Classifier] [# of parameters: %d]" % count_parameters(cl))
 
 # Loss
 CE = torch.nn.CrossEntropyLoss().cuda()

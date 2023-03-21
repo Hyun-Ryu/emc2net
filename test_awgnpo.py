@@ -18,9 +18,9 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 parser = argparse.ArgumentParser()
 parser.add_argument("--epoch", type=str, default='best', help='choose which trained epoch to use')
 parser.add_argument("--n_cpu", type=int, default=8, help='number of cpu threads to use during batch generation')
-parser.add_argument("--dim", type=int, default=128, help='hidden dimension of ISAB in classifier')
+parser.add_argument("--dim", type=int, default=256, help='hidden dimension of ISAB in classifier')
 parser.add_argument("--n_heads", type=int, default=4, help='number of attention heads of ISAB in classifier')
-parser.add_argument("--n_anc", type=int, default=64, help='number of inducing points of ISAB in classifier')
+parser.add_argument("--n_anc", type=int, default=16, help='number of inducing points of ISAB in classifier')
 parser.add_argument("--n_seeds", type=int, default=1, help='number of seed vectors of PMA in classifier')
 parser.add_argument("--n_class", type=int, default=8, help='number of target modulation types')
 parser.add_argument("--root", type=str, default="/home/user/amc", help='root directory')
@@ -35,7 +35,6 @@ LongTensor = torch.cuda.LongTensor if torch.cuda.is_available() else torch.LongT
 # Load Pre-trained Model
 cl = SetTransformer(dim_output=opt.n_class, dim_hidden=opt.dim, num_heads=opt.n_heads, num_inds=opt.n_anc, num_outputs=opt.n_seeds).cuda()
 cl.load_state_dict(torch.load(opt.root+"/experiments/"+opt.exp_name+"/saved_models/cl_epoch_%s.pth" % opt.epoch))
-print("[Classifier] [# of parameters: %d]" % count_parameters(cl))
 
 # Loss
 CE = torch.nn.CrossEntropyLoss().cuda()

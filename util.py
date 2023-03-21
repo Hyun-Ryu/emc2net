@@ -59,6 +59,3 @@ def draw_acc_epoch_curve(root, epoch, acc, acc_val, name):
     plt.ylabel('Accuracy')
     plt.legend(loc='upper left', prop={'size': 6})
     plt.savefig(root + '/acc_curve/%s_%d.png' % (name, epoch))
-
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)

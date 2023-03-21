@@ -1,6 +1,6 @@
 # EMC²-Net
 
-Official PyTorch implementation of the submitted paper "EMC²-Net: Joint Equalization and Modulation Classification based on Constellation Network".
+Official source codes for "EMC²-Net: Joint Equalization and Modulation Classification based on Constellation Network", ICASSP 2023.
 
 ## Prerequisites
 - Linux or macOS
@@ -31,26 +31,44 @@ cd emc2net
 ## Train
 ### Phase 1: *Classifier pretraining*
 ```bash
-python train_phase1_noise_cirriculum.py --root "YOUR OWN ROOT DIRECTORY"
+python train_phase1_noise_cirriculum.py \
+    --root "YOUR OWN ROOT DIRECTORY" \
+    --data_name "NAME OF DATASET" \
+    --exp_name "NAME OF EXPERIMENT"
 ```
 
 ### Phase 2: *Equalizer training*
 ```bash
-python train_phase2.py --root "YOUR OWN ROOT DIRECTORY" --data_name "NAME OF DATASET" --exp_name "NAME OF EXPERIMENT"
+python train_phase2.py \
+    --root "YOUR OWN ROOT DIRECTORY" \
+    --data_name "NAME OF DATASET" \
+    --exp_name "NAME OF EXPERIMENT" \
+    --pretrain_exp_name "NAME OF PHASE 1 EXPERIMENT"
 ```
 
 ### Phase 3: *Equalizer-classifier fine-tuning*
 ```bash
-python train_phase3.py --root "YOUR OWN ROOT DIRECTORY" --data_name "NAME OF DATASET" --exp_name "NAME OF EXPERIMENT"
+python train_phase3.py \
+    --root "YOUR OWN ROOT DIRECTORY" \
+    --data_name "NAME OF DATASET" \
+    --exp_name "NAME OF EXPERIMENT" \
+    --pretrain_exp_name "NAME OF PHASE 1 EXPERIMENT" \
+    --phase2_exp_name "NAME OF PHASE 2 EXPERIMENT"
 ```
 
 ## Test
 ### Fading datasets: Rician, Rayleigh
 ```bash
-python test_fading.py --root "YOUR OWN ROOT DIRECTORY" --data_name "NAME OF DATASET" --exp_name "NAME OF EXPERIMENT"
+python test_fading.py \
+    --root "YOUR OWN ROOT DIRECTORY" \
+    --data_name "NAME OF DATASET" \
+    --exp_name "NAME OF EXPERIMENT"
 ```
 
 ### Pretraining dataset: AWGN+PO
 ```bash
-python test_awgnpo.py --root "YOUR OWN ROOT DIRECTORY"
+python test_awgnpo.py \
+    --root "YOUR OWN ROOT DIRECTORY" \
+    --data_name "NAME OF DATASET" \
+    --exp_name "NAME OF EXPERIMENT"
 ```

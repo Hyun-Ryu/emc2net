@@ -52,15 +52,13 @@ MOD2R2 = {
 
 # Load Models
 eq = RBx2(dim_hidden=2, ker_size=65).cuda()
-print("[Equalizer] [# of parameters: %d]" % count_parameters(eq))
 
 MF = RRC(N=33, alpha=.35, OS=8)
 for para in MF.parameters():
     para.requires_grad = False
 
-cl = SetTransformer(dim_output=8, dim_hidden=128, num_heads=4, num_inds=64, num_outputs=1).cuda()
+cl = SetTransformer(dim_output=8, dim_hidden=256, num_heads=4, num_inds=16, num_outputs=1).cuda()
 cl.load_state_dict(torch.load(opt.root+'/experiments/%s/saved_models/cl_epoch_best.pth' % opt.pretrain_exp_name))
-print("[Classifier] [# of parameters: %d]" % count_parameters(cl))
 for para in cl.parameters():
     para.requires_grad = False
 
