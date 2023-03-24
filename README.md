@@ -1,6 +1,16 @@
-# EMC²-Net
+<h2 align="center">EMC²-Net: Joint Equalization and Modulation Classification based on Constellation Network</h2>
 
-Official source codes for "EMC²-Net: Joint Equalization and Modulation Classification based on Constellation Network", ICASSP 2023.
+<p align="center">
+<img width="50%" src="figure/emc2-net-rev3.PNG" class="center">
+</p>
+
+### Paper
+Official source code for ["EMC²-Net: Joint Equalization and Modulation Classification based on Constellation Network"](https://arxiv.org/abs/2303.10934), ICASSP 2023 [[1]](#ref).
+
+We propose a novel MC technique dubbed as EMC²-Net. The main contributions of our work are:
+1. Understand constellation as a set of 2D points rather than an image.
+2. Train equalizer and classifier jointly under the supervision of modulation type. Two NNs perform separate and explainable roles.
+3. Show SOTA performance on the linear modulation classification with much less complexity.
 
 ## Prerequisites
 - Linux or macOS
@@ -71,4 +81,15 @@ python test_awgnpo.py \
     --root "YOUR OWN ROOT DIRECTORY" \
     --data_name "NAME OF DATASET" \
     --exp_name "NAME OF EXPERIMENT"
+```
+
+## Citation
+<a name="ref"></a>
+```bash
+@article{ryu2023emc2,
+  title={EMC2-Net: Joint Equalization and Modulation Classification based on Constellation Network},
+  author={Ryu, Hyun and Choi, Junil},
+  journal={arXiv preprint arXiv:2303.10934},
+  year={2023}
+}
 ```
