@@ -1,7 +1,7 @@
 <h2 align="center">EMC²-Net: Joint Equalization and Modulation Classification based on Constellation Network</h2>
 
 <p align="center">
-<img width="50%" src="figure/emc2-net-rev3.PNG" class="center">
+<img width="90%" src="figure/image_icassp_emc2net.png" class="center">
 </p>
 
 ### Paper
@@ -86,10 +86,12 @@ python test_awgnpo.py \
 ## Citation
 <a name="ref"></a>
 ```bash
-@article{ryu2023emc2,
-  title={EMC2-Net: Joint Equalization and Modulation Classification based on Constellation Network},
+@inproceedings{ryu2023emc,
+  title={EMC 2-Net: Joint Equalization and Modulation Classification Based on Constellation Network},
   author={Ryu, Hyun and Choi, Junil},
-  journal={arXiv preprint arXiv:2303.10934},
-  year={2023}
+  booktitle={ICASSP 2023-2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  pages={1--5},
+  year={2023},
+  organization={IEEE}
 }
 ```
